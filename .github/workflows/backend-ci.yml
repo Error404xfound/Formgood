@@ -1,0 +1,34 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./backend/Formgood.sln
+
+      - name: Build
+        run: dotnet build ./backend/Formgood.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ./backend/tests/Formgood.Api.Tests/Formgood.Api.Tests.csproj --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish ./backend/Formgood.sln --configuration Release --output ./backend/publish --no-build

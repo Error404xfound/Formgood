@@ -1,0 +1,45 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./backend/Formgood.sln
+
+      - name: Build the project
+        run: dotnet build ./backend/Formgood.sln --configuration Release --no-restore
+
+      - name: Publish the project
+        run: dotnet publish ./backend/Formgood.Api -c Release -o ./backend/publish
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: <YOUR_AZURE_APP_NAME>
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: ./backend/publish
+
+      - name: Deploy Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          az webapp deployment source config-zip --resource-group <YOUR_RESOURCE_GROUP> --name <YOUR_AZURE_APP_NAME> --src ./build.zip
+
+      - name: Clean up
+        run: dotnet clean ./backend/Formgood.sln --configuration Release
