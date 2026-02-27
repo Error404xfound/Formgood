@@ -1,9 +1,7 @@
 name: Deploy to Azure
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -11,12 +9,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore dependencies
         run: dotnet restore ./backend/Formgood.sln
@@ -25,21 +23,40 @@ jobs:
         run: dotnet build ./backend/Formgood.sln --configuration Release --no-restore
 
       - name: Publish the project
-        run: dotnet publish ./backend/Formgood.Api -c Release -o ./backend/publish
+        run: dotnet publish ./backend/src/Formgood.Api/Formgood.Api.csproj -c Release -o ./backend/publish
+
+      - name: Validate Azure deployment configuration
+        env:
+          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_PUBLISH_PROFILE: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        run: |
+          if [ -z "$AZURE_APP_NAME" ] || [ -z "$AZURE_RESOURCE_GROUP" ] || [ -z "$AZURE_PUBLISH_PROFILE" ]; then
+            echo "Azure deploy configuration is incomplete. Set repo variables AZURE_APP_NAME, AZURE_RESOURCE_GROUP and secret AZURE_PUBLISH_PROFILE before running deploy workflow."
+            exit 1
+          fi
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
+        env:
+          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
         with:
-          app-name: <YOUR_AZURE_APP_NAME>
+          app-name: ${{ env.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ./backend/publish
 
       - name: Deploy Frontend
+        env:
+          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
         run: |
           cd frontend
-          npm install
+          npm ci
           npm run build
-          az webapp deployment source config-zip --resource-group <YOUR_RESOURCE_GROUP> --name <YOUR_AZURE_APP_NAME> --src ./build.zip
+          cd build
+          zip -r ../build.zip .
+          cd ..
+          az webapp deployment source config-zip --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_APP_NAME" --src ./build.zip
 
       - name: Clean up
         run: dotnet clean ./backend/Formgood.sln --configuration Release

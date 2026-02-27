@@ -14,12 +14,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore dependencies
         run: dotnet restore ./backend/Formgood.sln
@@ -27,8 +27,15 @@ jobs:
       - name: Build
         run: dotnet build ./backend/Formgood.sln --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test ./backend/tests/Formgood.Api.Tests/Formgood.Api.Tests.csproj --no-build --verbosity normal
+      - name: Run tests (if present)
+        shell: bash
+        run: |
+          TEST_PROJECTS=$(find ./backend/tests -name "*.csproj" | wc -l)
+          if [ "$TEST_PROJECTS" -eq 0 ]; then
+            echo "No backend test projects found yet. Skipping tests for scaffold stage."
+            exit 0
+          fi
+          dotnet test ./backend/tests --configuration Release --no-build --verbosity normal
 
       - name: Publish
         run: dotnet publish ./backend/Formgood.sln --configuration Release --output ./backend/publish --no-build
