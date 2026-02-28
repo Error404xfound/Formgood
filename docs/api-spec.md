@@ -160,3 +160,28 @@ All error responses will follow this format:
 
 ## Conclusion
 This API specification serves as a guide for developers to interact with the Formgood MVP backend. Ensure to follow the authentication process and adhere to the request/response formats for successful integration.
+
+# Internal Service Contract for Formgood MVP
+
+## Status
+Formgood does **not** expose a public developer API or webhook surface in this MVP.
+
+This document is retained only as an internal reference for frontend-backend integration inside the Formgood application and may change without notice.
+
+## Scope
+- Internal app communication only.
+- No third-party API access.
+- No external webhook registration or delivery.
+
+## Authentication
+- End-user authentication remains Microsoft/Google OAuth through the Formgood app.
+- Any backend routes are private to first-party Formgood clients.
+
+## Notes for MVP
+- Prioritize internal contracts required for:
+  - auth/session handling,
+  - survey metadata management,
+  - reciprocity/points ledger operations,
+  - feed retrieval,
+  - dashboard summaries.
+- Do not publish external API docs, SDKs, or webhook guides for MVP.

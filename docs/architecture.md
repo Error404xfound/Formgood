@@ -7,18 +7,18 @@ This document provides an overview of the architecture for the Formgood MVP, a m
 The Formgood MVP architecture consists of three main components:
 
 1. **Frontend**: A React application built with TypeScript, responsible for user interactions and displaying survey data.
-2. **Backend**: An ASP.NET Core API that handles business logic, user authentication, and data management.
+2. **Backend**: An ASP.NET Core service layer that handles business logic, user authentication, and data management for first-party Formgood clients.
 3. **Infrastructure**: Azure PaaS services that host the application and manage resources.
 
 ### Component Diagram
 - **Frontend**:
   - React + TypeScript
   - Components for authentication, dashboard, survey feed, rewards, and surveys
-  - Services for API interaction
+  - Services for internal app-service interaction
 
 - **Backend**:
-  - ASP.NET Core API
-  - Controllers for handling requests
+  - ASP.NET Core
+  - Controllers/routes used internally by the Formgood app
   - Application layer for business logic
   - Domain models for users, surveys, and points
 
@@ -28,16 +28,20 @@ The Formgood MVP architecture consists of three main components:
   - Azure Storage for any static assets or logs
 
 ## Key Technologies
-- **Frontend**: React, TypeScript, Axios for API calls
+- **Frontend**: React, TypeScript, Axios for service calls
 - **Backend**: ASP.NET Core, Entity Framework Core for data access
 - **Authentication**: Microsoft and Google OAuth for user authentication
 - **Cloud Services**: Azure App Service, Azure SQL Database, Azure Storage
 
 ## Data Flow
-1. **User Authentication**: Users authenticate via Microsoft or Google OAuth, receiving a token for session management.
+1. **User Authentication**: Users authenticate via Microsoft or Google OAuth for session access.
 2. **Survey Distribution**: Users link external surveys and define parameters (completion time, rewards) through the frontend.
 3. **Reciprocity Engine**: The backend tracks Time Points and Life Points, enforcing the 1:1 reciprocity rule.
 4. **Feed & Discovery**: The frontend displays a feed of available surveys based on freshness, quality, and user preferences.
+
+## Explicit MVP Boundary
+- No public API program.
+- No external webhook system.
 
 ## Conclusion
 The architecture of Formgood MVP is designed to be scalable and maintainable, focusing on delivering a seamless user experience while ensuring robust backend processing. This architecture supports the core functionalities of survey distribution and reciprocity, setting the foundation for future enhancements.

@@ -5,6 +5,10 @@
 ### Overview
 Formgood is a mobile-first survey distribution platform designed to facilitate the distribution of surveys without the need for users to create or store survey responses. Users can leverage existing surveys from platforms like Google Forms, Qualtrics, or Typeform and utilize Formgood to distribute them effectively. The platform operates on a unique reciprocity model, allowing users to earn Time Points by completing surveys, which can then be spent to distribute their own surveys. Additionally, users can earn Life Points that contribute to social good initiatives.
 
+### Important Scope Note
+For MVP, the backend is for **first-party Formgood application use only**.  
+Formgood does **not** expose a public developer API or webhook surface at this stage.
+
 ### Problem Statement
 Survey distribution today often faces challenges such as high costs, administrative friction, and low motivation among respondents. Many platforms require payment or complex setups, discouraging users from participating in surveys or sharing their own.
 
@@ -15,6 +19,7 @@ Formgood addresses these challenges through a reciprocity system that incentiviz
 - No survey creation tools or builder functionality.
 - No storage of raw survey responses.
 - No payment integration or monetization features.
+- No public API or webhook products for external consumers.
 
 ### Core Value Propositions
 - Free, reciprocal access for researchers and survey creators.
@@ -24,11 +29,11 @@ Formgood addresses these challenges through a reciprocity system that incentiviz
 
 ### High-Level System Diagram
 The backend architecture consists of the following key components:
-- **Frontend**: React + TypeScript application that communicates with the backend API.
-- **Backend**: ASP.NET Core API handling business logic, user authentication, and data processing.
+- **Frontend**: React + TypeScript application that communicates with internal backend services.
+- **Backend**: ASP.NET Core handling business logic, user authentication, and data processing.
 - **Database**: Azure SQL Database for storing user profiles, survey metadata, and points tracking.
 - **OAuth Providers**: Integration with Microsoft and Google for user authentication.
-- **Azure Services**: Utilization of Azure App Service for hosting the API and Azure Storage for any necessary file storage.
+- **Azure Services**: Utilization of Azure App Service for hosting and Azure Storage for any necessary file storage.
 
 ### Getting Started
 To set up the backend locally, ensure you have the following prerequisites:

@@ -18,6 +18,8 @@ Formgood addresses these issues through a reciprocity model that rewards users f
 - No survey creation tools or builder functionality.
 - No storage of survey responses.
 - No payment integration or monetization features.
+- No public API program for third-party consumers.
+- No webhook product surface for external integrations.
 
 ### Core Value Propositions
 - Free, reciprocal access for researchers.
@@ -28,7 +30,7 @@ Formgood addresses these issues through a reciprocity model that rewards users f
 ### High-Level System Diagram
 The Formgood architecture consists of:
 - **Frontend**: Built with React and TypeScript, providing a mobile-first user interface.
-- **Backend**: Developed using ASP.NET C#, handling API requests and business logic.
+- **Backend**: Developed using ASP.NET C#, handling internal application services and business logic (not exposed as a public developer API).
 - **Databases**: Azure SQL or Cosmos DB for storing user and survey metadata.
 - **OAuth Providers**: Microsoft and Google for user authentication.
 - **Azure Services**: Utilizing Azure PaaS for hosting and scaling the application.
@@ -69,7 +71,7 @@ The Formgood architecture consists of:
 - **Core MVP Features**:
   - Selecting a survey from the feed.
   - Redirecting to external survey.
-  - Handling completion callbacks or user self-report.
+  - Handling completion self-report with safeguards.
 - **MVP-essential**: Yes
 
 ### Rewards & Social Impact
@@ -142,7 +144,7 @@ The Formgood architecture consists of:
 
 ### Backend (.NET C# / ASP.NET)
 - Define domain models for users, surveys, and points.
-- Create API endpoints for survey metadata and points management.
+- Create internal application endpoints for app functionality (not public developer API).
 - Implement logging and error handling.
 - Knowledge needed: ASP.NET Core, Entity Framework, RESTful APIs.
 - Resources to study: ASP.NET Core documentation, Entity Framework tutorials.
