@@ -29,4 +29,3 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
 
 output appInsightsInstrumentationKey string = appInsights.properties.InstrumentationKey
 output logAnalyticsWorkspaceId string = logAnalytics.id
-output logAnalyticsPrimaryKey string = listKeys(logAnalytics.id, '2020-08-01').primarySharedKey

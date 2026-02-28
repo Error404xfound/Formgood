@@ -1,6 +1,7 @@
 param sqlServerName string
 param sqlDatabaseName string
 param adminUsername string
+@secure()
 param adminPassword string
 
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
@@ -22,4 +23,5 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-02-01-preview' = {
   }
 }
 
-output sqlServerConnectionString string = 'Server=tcp:${sqlServer.name}.database.windows.net;Database=${sqlDatabase.name};User ID=${adminUsername};Password=${adminPassword};Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;'
+output sqlServerFqdn string = '${sqlServer.name}.database.windows.net'
+output sqlDatabaseNameOut string = sqlDatabase.name

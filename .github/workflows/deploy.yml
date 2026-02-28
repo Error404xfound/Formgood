@@ -7,6 +7,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      SQL_ADMIN_USERNAME: ${{ secrets.SQL_ADMIN_USERNAME }}
+      SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      STORAGE_ACCOUNT_KEY: ${{ secrets.STORAGE_ACCOUNT_KEY }}
+      APP_CONNECTION_STRING: ${{ secrets.APP_CONNECTION_STRING }}
+      JWT_KEY: ${{ secrets.JWT_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,19 +37,19 @@ jobs:
 
       - name: Validate Azure deployment configuration
         env:
-          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
-          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
           AZURE_PUBLISH_PROFILE: ${{ secrets.AZURE_PUBLISH_PROFILE }}
         run: |
           if [ -z "$AZURE_APP_NAME" ] || [ -z "$AZURE_RESOURCE_GROUP" ] || [ -z "$AZURE_PUBLISH_PROFILE" ]; then
-            echo "Azure deploy configuration is incomplete. Set repo variables AZURE_APP_NAME, AZURE_RESOURCE_GROUP and secret AZURE_PUBLISH_PROFILE before running deploy workflow."
+            echo "Azure deploy configuration is incomplete. Set secrets AZURE_APP_NAME, AZURE_RESOURCE_GROUP, and AZURE_PUBLISH_PROFILE before running deploy workflow."
             exit 1
           fi
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         env:
-          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+          AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
         with:
           app-name: ${{ env.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
@@ -47,8 +57,8 @@ jobs:
 
       - name: Deploy Frontend
         env:
-          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-          AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
         run: |
           cd frontend
           npm ci
@@ -57,6 +67,16 @@ jobs:
           zip -r ../build.zip .
           cd ..
           az webapp deployment source config-zip --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_APP_NAME" --src ./build.zip
+
+      - name: Deploy Bicep
+        run: |
+          az deployment group create \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --template-file infra/bicep/main.bicep \
+            --parameters appName=formgood \
+                         sqlAdminUsername="$SQL_ADMIN_USERNAME" \
+                         sqlAdminPassword="$SQL_ADMIN_PASSWORD" \
+                         storageAccountKey="$STORAGE_ACCOUNT_KEY"
 
       - name: Clean up
         run: dotnet clean ./backend/Formgood.sln --configuration Release

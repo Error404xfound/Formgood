@@ -1,5 +1,6 @@
 param appServiceName string
 param appServicePlanName string
+param appServicePlanResourceId string
 param location string = resourceGroup().location
 param sku string = 'S1'
 
@@ -8,13 +9,8 @@ resource appService 'Microsoft.Web/sites@2021-02-01' = {
   location: location
   kind: 'app'
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: appServicePlanResourceId
     httpsOnly: true
-  }
-  sku: {
-    name: sku
-    tier: 'Standard'
-    capacity: 1
   }
 }
 

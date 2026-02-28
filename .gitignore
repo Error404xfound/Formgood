@@ -35,3 +35,13 @@ backend/.vs/
 # Local-only private docs (never commit)
 docs/*.private.md
 docs/**/*.private.md
+
+# Local secrets / environment overrides
+**/.env
+**/.env.local
+**/.env.*.local
+**/secrets.json
+**/appsettings.Development.local.json
+**/appsettings.Local.json
+**/*.user
+**/*.suo

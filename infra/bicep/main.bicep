@@ -1,6 +1,15 @@
 param appName string
 param location string = resourceGroup().location
 
+@secure()
+param sqlAdminUsername string
+
+@secure()
+param sqlAdminPassword string
+
+@secure()
+param storageAccountKey string
+
 var appServicePlanName = '${appName}-asp'
 var webAppName = '${appName}-web'
 var sqlServerName = '${appName}sql'
@@ -25,7 +34,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     appSettings: [
       {
         name: 'AzureWebJobsStorage'
-        value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=<your_account_key>;EndpointSuffix=core.windows.net'
+        value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=core.windows.net'
       }
       {
         name: 'WEBSITE_RUN_FROM_PACKAGE'
@@ -39,8 +48,8 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: sqlServerName
   location: location
   properties: {
-    administratorLogin: '<your_admin_username>'
-    administratorLoginPassword: '<your_admin_password>'
+    administratorLogin: sqlAdminUsername
+    administratorLoginPassword: sqlAdminPassword
   }
 }
 
@@ -63,4 +72,5 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
 }
 
 output webAppUrl string = webApp.defaultHostName
-output sqlConnectionString string = 'Server=tcp:${sqlServerName}.database.windows.net;Database=${sqlDatabaseName};User ID=<your_admin_username>@${sqlServerName};Password=<your_admin_password>;Encrypt=true;Connection Timeout=30;'
+output sqlServerFqdn string = '${sqlServerName}.database.windows.net'
+output sqlDatabaseNameOut string = sqlDatabaseName
