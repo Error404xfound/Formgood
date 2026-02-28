@@ -31,9 +31,15 @@ jobs:
         run: npm run build
         working-directory: frontend
 
-      - name: Run tests
-        run: npm test -- --watchAll=false --passWithNoTests
+      - name: Run tests (if configured)
+        shell: bash
         working-directory: frontend
+        run: |
+          if npm run | grep -qE '^\s+test\s'; then
+            npm test -- --watchAll=false --passWithNoTests
+          else
+            echo "No test script configured yet. Skipping tests for scaffold stage."
+          fi
 
       - name: Upload coverage report
         if: success() && hashFiles('frontend/coverage/**') != ''
