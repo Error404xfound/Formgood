@@ -31,3 +31,7 @@ backend/.vs/
 
 # Azure / Infra local artifacts
 *.bicepconfig.local.json
+
+# Local-only private docs (never commit)
+docs/*.private.md
+docs/**/*.private.md
